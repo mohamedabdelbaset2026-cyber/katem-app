@@ -2,32 +2,13 @@ package com.example.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
-import com.example.R
 
-val CairoFontFamily = FontFamily(
-    Font(R.font.cairo, FontWeight.Normal),
-    Font(R.font.cairo, FontWeight.Medium),
-    Font(R.font.cairo, FontWeight.SemiBold),
-    Font(R.font.cairo, FontWeight.Bold)
-)
-
-val IbmPlexArabicFontFamily = FontFamily(
-    Font(R.font.ibm_plex_sans_arabic, FontWeight.Normal),
-    Font(R.font.ibm_plex_sans_arabic, FontWeight.Medium),
-    Font(R.font.ibm_plex_sans_arabic, FontWeight.SemiBold),
-    Font(R.font.ibm_plex_sans_arabic, FontWeight.Bold)
-)
-
-val JetBrainsMonoFontFamily = FontFamily(
-    Font(R.font.jetbrains_mono, FontWeight.Normal),
-    Font(R.font.jetbrains_mono, FontWeight.Medium),
-    Font(R.font.jetbrains_mono, FontWeight.SemiBold),
-    Font(R.font.jetbrains_mono, FontWeight.Bold)
-)
+val CairoFontFamily = FontFamily.SansSerif
+val IbmPlexArabicFontFamily = FontFamily.SansSerif
+val JetBrainsMonoFontFamily = FontFamily.Monospace
 
 val KatemTypography = Typography(
     displayLarge = TextStyle(

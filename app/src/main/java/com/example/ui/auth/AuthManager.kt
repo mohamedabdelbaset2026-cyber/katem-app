@@ -10,7 +10,6 @@ import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
 import androidx.credentials.exceptions.GetCredentialCancellationException
 import androidx.credentials.exceptions.NoCredentialException
-import com.example.R
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
@@ -38,6 +37,15 @@ private tailrec fun Context.findActivity(): Activity? = when (this) {
     else -> null
 }
 
+private fun resolveWebClientId(context: Context): String? {
+    val resId = context.resources.getIdentifier(
+        "default_web_client_id",
+        "string",
+        context.packageName
+    )
+    return if (resId != 0) context.getString(resId).takeIf { it.isNotBlank() } else null
+}
+
 fun FirebaseAuth.authStateFlow(): Flow<FirebaseUser?> = callbackFlow {
     val listener = FirebaseAuth.AuthStateListener { firebaseAuth ->
         trySend(firebaseAuth.currentUser)
@@ -46,9 +54,6 @@ fun FirebaseAuth.authStateFlow(): Flow<FirebaseUser?> = callbackFlow {
     awaitClose { removeAuthStateListener(listener) }
 }
 
-/**
- * Silent startup credential restoration using strictly ONE credential option (GetGoogleIdOption).
- */
 fun attemptAutoSignIn(
     context: Context,
     credentialManager: CredentialManager,
@@ -60,9 +65,8 @@ fun attemptAutoSignIn(
         onAuthSuccess()
         return
     }
-    val clientId = try {
-        context.getString(R.string.default_web_client_id)
-    } catch (_: Exception) {
+    val clientId = resolveWebClientId(context)
+    if (clientId == null) {
         onUnauthenticated()
         return
     }
@@ -99,10 +103,6 @@ fun attemptAutoSignIn(
     }
 }
 
-/**
- * Interactive Google Sign-In using strictly ONE credential option (GetSignInWithGoogleOption)
- * and distinct GetCredentialCancellationException observability.
- */
 fun onGoogleSignInClicked(
     context: Context,
     credentialManager: CredentialManager,
@@ -111,10 +111,9 @@ fun onGoogleSignInClicked(
     scope: CoroutineScope,
     onAuthCancelled: () -> Unit = {}
 ) {
-    val clientId = try {
-        context.getString(R.string.default_web_client_id)
-    } catch (_: Exception) {
-        onAuthError("إعدادات Google Sign-In غير مكتملة (default_web_client_id مفقود).")
+    val clientId = resolveWebClientId(context)
+    if (clientId == null) {
+        onAuthError("إعدادات Google Sign-In غير مفعّلة في هذا المشروع.")
         return
     }
     val activity = context.findActivity()
@@ -138,21 +137,18 @@ fun onGoogleSignInClicked(
                 onAuthError("نوع بيانات الاعتماد غير متوقع.")
             }
         } catch (e: GetCredentialCancellationException) {
-            Log.w(TAG, "Google Sign-In cancelled or dismissed: ${e.message}", e)
+            Log.w(TAG, "Google Sign-In cancelled: ${e.message}", e)
             onAuthCancelled()
         } catch (e: NoCredentialException) {
-            Log.w(TAG, "No Google credential available on emulator/device: ${e.message}", e)
-            onAuthError("لا يوجد حساب Google مسجّل على هذا المحاكي. يمكنك استخدام زر (تجربة التطبيق الآن بالرقم الفريد) بالأسفل لاختبار التطبيق فورًا.")
+            Log.w(TAG, "No Google credential: ${e.message}", e)
+            onAuthError("لا يوجد حساب Google مسجّل على هذا الجهاز.")
         } catch (e: Exception) {
             Log.e(TAG, "Google Sign-In failed", e)
-            onAuthError(e.localizedMessage ?: "تعذر تسجيل الدخول عبر Google. يمكنك تجربة التطبيق بالوضع المحلي بالأسفل.")
+            onAuthError(e.localizedMessage ?: "تعذر تسجيل الدخول عبر Google.")
         }
     }
 }
 
-/**
- * Safe sign-out clearing Credential Manager state inside NonCancellable before Firebase.auth.signOut().
- */
 fun signOutSafely(
     credentialManager: CredentialManager,
     scope: CoroutineScope,
