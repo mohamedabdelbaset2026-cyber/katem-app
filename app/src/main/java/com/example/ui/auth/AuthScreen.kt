@@ -49,36 +49,31 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.credentials.CredentialManager
 import com.example.R
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+
 @Composable
 fun AuthScreen(
     onAuthSuccess: () -> Unit,
     onEnterLocalTestMode: () -> Unit
 ) {
-    val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    var isAttemptingAuto by remember { mutableStateOf(false) }
-var errorMessage by remember { mutableStateOf<String?>(null) }
+    var isLoading by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
 
-LaunchedEffect(Unit) {
-    if (Firebase.auth.currentUser != null) {
-        onAuthSuccess()
-    }
-}
-            scope = scope
-        )
+    LaunchedEffect(Unit) {
+        if (Firebase.auth.currentUser != null) {
+            onAuthSuccess()
+        }
     }
 
     Box(
@@ -95,7 +90,6 @@ LaunchedEffect(Unit) {
                 .navigationBarsPadding(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Hero Banner Art with smooth atmospheric gradient blend
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -120,7 +114,6 @@ LaunchedEffect(Unit) {
                             )
                         )
                 )
-                // Floating Brand Emblem Badge
                 Surface(
                     shape = CircleShape,
                     color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.92f),
@@ -170,7 +163,6 @@ LaunchedEffect(Unit) {
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // 3 Cryptographic Privacy Pillar Cards
                 Column(
                     verticalArrangement = Arrangement.spacedBy(10.dp),
                     modifier = Modifier.fillMaxWidth()
@@ -209,21 +201,22 @@ LaunchedEffect(Unit) {
                 }
 
                 Button(
-                   onClick = {
-    errorMessage = null
-    isLoading = true
-    scope.launch {
-        try {
-            Firebase.auth.signInAnonymously().await()
-            isLoading = false
-            onAuthSuccess()
-        } catch (e: Exception) {
-            isLoading = false
-            errorMessage = e.localizedMessage ?: "تعذر تسجيل الدخول، تأكد من الاتصال بالإنترنت وتفعيل Anonymous في Firebase."
-        }
-    }
-},
-                    enabled = !isLoading && !isAttemptingAuto,
+                    onClick = {
+                        errorMessage = null
+                        isLoading = true
+                        scope.launch {
+                            try {
+                                Firebase.auth.signInAnonymously().await()
+                                isLoading = false
+                                onAuthSuccess()
+                            } catch (e: Exception) {
+                                isLoading = false
+                                errorMessage = e.localizedMessage
+                                    ?: "تعذر الاتصال بـ Firebase. تأكد من تفعيل Anonymous في Firebase Console."
+                            }
+                        }
+                    },
+                    enabled = !isLoading,
                     shape = RoundedCornerShape(16.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.primary,
@@ -232,9 +225,9 @@ LaunchedEffect(Unit) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp)
-                        .testTag("google_sign_in_button")
+                        .testTag("anonymous_sign_in_button")
                 ) {
-                    if (isLoading || isAttemptingAuto) {
+                    if (isLoading) {
                         CircularProgressIndicator(
                             modifier = Modifier.size(22.dp),
                             color = MaterialTheme.colorScheme.onPrimary,
@@ -242,7 +235,7 @@ LaunchedEffect(Unit) {
                         )
                         Spacer(modifier = Modifier.width(12.dp))
                         Text(
-                            text = if (isAttemptingAuto) "جارٍ التحقق من الجلسة..." else "جارٍ المصادقة الآمنة...",
+                            text = "جارٍ إنشاء الجلسة المشفّرة...",
                             style = MaterialTheme.typography.labelLarge
                         )
                     } else {
@@ -253,7 +246,7 @@ LaunchedEffect(Unit) {
                         )
                         Spacer(modifier = Modifier.width(10.dp))
                         Text(
-                            text = stringResource(R.string.auth_sign_in_google),
+                            text = "بدء الاستخدام بالرقم الفريد (KTM-ID)",
                             style = MaterialTheme.typography.labelLarge,
                             fontWeight = FontWeight.Bold
                         )
@@ -262,16 +255,29 @@ LaunchedEffect(Unit) {
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                // Local Offline Zangi Test Mode (Zero Firestore calls; full real local E2EE + Unique ID + Name + Password)
-        
+                FilledTonalButton(
+                    onClick = onEnterLocalTestMode,
+                    enabled = !isLoading,
+                    shape = RoundedCornerShape(16.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(54.dp)
+                        .testTag("local_test_mode_button")
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Badge,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Text(
+                        text = "تجربة محلية بدون إنترنت",
+                        style = MaterialTheme.typography.labelLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
 
-                Spacer(modifier = Modifier.height(12.dp))
-                Text(
-                    text = "استخدم «وضع الاختبار المحلي» لتجربة توليد الرقم الفريد وكتابة اسمك وكلمة مرورك والمحادثات المشفّرة فورًا بدون حساب Google (دون مزامنة سحابية)، أو سجّل عبر Google للمزامنة السحابية عبر Firebase.",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    textAlign = TextAlign.Center
-                )
                 Spacer(modifier = Modifier.height(24.dp))
             }
         }
