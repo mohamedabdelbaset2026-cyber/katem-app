@@ -1,0 +1,379 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Private user account settings, identity mapping to Public User ID, and privacy preferences.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Internal Firebase Auth UID" },
+        "publicId": { "type": "string", "description": "Immutable unique shareable Public User ID (e.g. KTM-482917)" },
+        "displayName": { "type": "string", "description": "Optional user display name" },
+        "bio": { "type": "string", "description": "Optional short bio" },
+        "avatarUrl": { "type": "string", "description": "Optional avatar URL or preset token" },
+        "avatarColorIndex": { "type": "integer", "description": "Preset avatar tint index 0..7" },
+        "hideLastSeen": { "type": "boolean", "description": "Hide last seen timestamp from contacts" },
+        "showOnlineStatus": { "type": "boolean", "description": "Show online indicator to contacts" },
+        "hideNotificationPreview": { "type": "boolean", "description": "Hide sender/message details in notifications" },
+        "screenshotProtection": { "type": "boolean", "description": "Enable Android FLAG_SECURE screenshot prevention" },
+        "blurOnBackground": { "type": "boolean", "description": "Mask app content when switching to background" },
+        "disappearingDefaultSec": { "type": "integer", "description": "Default disappearing message timer in seconds (0 = off)" },
+        "lastSeenAt": { "type": "string", "format": "date-time", "description": "Server timestamp of last activity" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server timestamp on creation (FieldValue.serverTimestamp())" },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Server timestamp on update (FieldValue.serverTimestamp())" }
+      },
+      "required": [
+        "userId",
+        "publicId",
+        "displayName",
+        "bio",
+        "avatarUrl",
+        "avatarColorIndex",
+        "hideLastSeen",
+        "showOnlineStatus",
+        "hideNotificationPreview",
+        "screenshotProtection",
+        "blurOnBackground",
+        "disappearingDefaultSec",
+        "lastSeenAt",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "PublicIdDirectory": {
+      "title": "PublicIdDirectory",
+      "description": "Atomic unique Public User ID registry for friend lookup via ID, QR code, or invite link without exposing PII.",
+      "type": "object",
+      "properties": {
+        "publicId": { "type": "string", "description": "Normalized unique Public User ID matching document ID" },
+        "ownerUid": { "type": "string", "description": "Owner Firebase Auth UID" },
+        "displayName": { "type": "string", "description": "Public display name" },
+        "bio": { "type": "string", "description": "Public short bio" },
+        "avatarUrl": { "type": "string", "description": "Public avatar URL or empty" },
+        "avatarColorIndex": { "type": "integer", "description": "Preset avatar tint index 0..7" },
+        "onlineVisible": { "type": "boolean", "description": "Whether online presence is visible" },
+        "online": { "type": "boolean", "description": "Current online flag" },
+        "lastSeenVisible": { "type": "boolean", "description": "Whether last seen is visible" },
+        "lastSeenAt": { "type": "string", "format": "date-time", "description": "Last activity server timestamp" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server timestamp on claim" },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Server timestamp on profile sync" }
+      },
+      "required": [
+        "publicId",
+        "ownerUid",
+        "displayName",
+        "bio",
+        "avatarUrl",
+        "avatarColorIndex",
+        "onlineVisible",
+        "online",
+        "lastSeenVisible",
+        "lastSeenAt",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "EncryptionKey": {
+      "title": "EncryptionKey",
+      "description": "Public ECDH P-256 identity key for real end-to-end encryption.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Owner Firebase Auth UID" },
+        "publicKeyBase64": { "type": "string", "description": "Base64-encoded X.509 EC P-256 public key" },
+        "fingerprint": { "type": "string", "description": "SHA-256 safety number fingerprint" },
+        "algorithm": { "type": "string", "enum": ["ECDH-P256-AES256-GCM"], "description": "Standard cryptographic suite" },
+        "keyVersion": { "type": "integer", "description": "Monotonic key rotation version" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "publicKeyBase64", "fingerprint", "algorithm", "keyVersion", "createdAt", "updatedAt"]
+    },
+    "ContactEntry": {
+      "title": "ContactEntry",
+      "description": "Saved contact discovered by Public User ID or QR code.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Owner UID" },
+        "contactUid": { "type": "string", "description": "Contact Firebase UID" },
+        "contactPublicId": { "type": "string", "description": "Contact Public User ID" },
+        "displayName": { "type": "string", "description": "Contact display name" },
+        "bio": { "type": "string", "description": "Contact bio" },
+        "avatarUrl": { "type": "string", "description": "Contact avatar URL" },
+        "avatarColorIndex": { "type": "integer" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "contactUid", "contactPublicId", "displayName", "bio", "avatarUrl", "avatarColorIndex", "createdAt", "updatedAt"]
+    },
+    "DeviceSession": {
+      "title": "DeviceSession",
+      "description": "Registered device record under the user's account.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "deviceName": { "type": "string" },
+        "platform": { "type": "string", "enum": ["android"] },
+        "appVersion": { "type": "string" },
+        "lastActiveAt": { "type": "string", "format": "date-time" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "deviceName", "platform", "appVersion", "lastActiveAt", "createdAt", "updatedAt"]
+    },
+    "RecoveryData": {
+      "title": "RecoveryData",
+      "description": "Client-side PBKDF2 + AES-256-GCM encrypted backup of the user's E2EE private key.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "encryptedBlob": { "type": "string" },
+        "saltBase64": { "type": "string" },
+        "ivBase64": { "type": "string" },
+        "kdfIterations": { "type": "integer" },
+        "keyVersion": { "type": "integer" },
+        "failedAttempts": { "type": "integer" },
+        "lockedUntilEpochMs": { "type": "integer" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "encryptedBlob", "saltBase64", "ivBase64", "kdfIterations", "keyVersion", "failedAttempts", "lockedUntilEpochMs", "createdAt", "updatedAt"]
+    },
+    "BlockedUser": {
+      "title": "BlockedUser",
+      "description": "Blocked user entry owned by the blocker.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "blockedUid": { "type": "string" },
+        "blockedPublicId": { "type": "string" },
+        "blockedDisplayName": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "blockedUid", "blockedPublicId", "blockedDisplayName", "createdAt"]
+    },
+    "UserNotification": {
+      "title": "UserNotification",
+      "description": "Privacy-safe notification record without plaintext message contents.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "conversationId": { "type": "string" },
+        "senderUid": { "type": "string" },
+        "senderPublicId": { "type": "string" },
+        "senderName": { "type": "string" },
+        "type": { "type": "string", "enum": ["message", "media", "contact"] },
+        "previewHidden": { "type": "boolean" },
+        "read": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "conversationId", "senderUid", "senderPublicId", "senderName", "type", "previewHidden", "read", "createdAt", "updatedAt"]
+    },
+    "Conversation": {
+      "title": "Conversation",
+      "description": "Private 1-to-1 encrypted conversation metadata.",
+      "type": "object",
+      "properties": {
+        "memberUids": { "type": "array", "description": "1 (self) or 2 member UIDs" },
+        "member1Uid": { "type": "string" },
+        "member1PublicId": { "type": "string" },
+        "member1Name": { "type": "string" },
+        "member1Avatar": { "type": "string" },
+        "member1ColorIndex": { "type": "integer" },
+        "member2Uid": { "type": "string" },
+        "member2PublicId": { "type": "string" },
+        "member2Name": { "type": "string" },
+        "member2Avatar": { "type": "string" },
+        "member2ColorIndex": { "type": "integer" },
+        "lastMessageLabel": { "type": "string", "description": "Generic encrypted/media summary label (never plaintext)" },
+        "lastMessageType": { "type": "string", "enum": ["text", "image", "video", "voice", "document", "system"] },
+        "lastMessageSenderUid": { "type": "string" },
+        "lastMessageAt": { "type": "string", "format": "date-time" },
+        "typingUid": { "type": "string" },
+        "archivedByUids": { "type": "array" },
+        "deletedByUids": { "type": "array" },
+        "disappearingSeconds": { "type": "integer" },
+        "createdByUid": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": [
+        "memberUids",
+        "member1Uid",
+        "member1PublicId",
+        "member1Name",
+        "member1Avatar",
+        "member1ColorIndex",
+        "member2Uid",
+        "member2PublicId",
+        "member2Name",
+        "member2Avatar",
+        "member2ColorIndex",
+        "lastMessageLabel",
+        "lastMessageType",
+        "lastMessageSenderUid",
+        "lastMessageAt",
+        "typingUid",
+        "archivedByUids",
+        "deletedByUids",
+        "disappearingSeconds",
+        "createdByUid",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "ChatMessage": {
+      "title": "ChatMessage",
+      "description": "End-to-end encrypted text message or Hostinger-backed media message.",
+      "type": "object",
+      "properties": {
+        "conversationId": { "type": "string" },
+        "memberUids": { "type": "array" },
+        "senderUid": { "type": "string" },
+        "senderPublicId": { "type": "string" },
+        "messageType": { "type": "string", "enum": ["text", "image", "video", "voice", "document"] },
+        "ciphertext": { "type": "string" },
+        "iv": { "type": "string" },
+        "encryptionScheme": { "type": "string", "enum": ["ECDH-P256-AES256-GCM", "NONE_MEDIA"] },
+        "mediaFileId": { "type": "string" },
+        "mediaUrl": { "type": "string" },
+        "mediaMimeType": { "type": "string" },
+        "mediaFileName": { "type": "string" },
+        "mediaSizeBytes": { "type": "integer" },
+        "mediaDurationSec": { "type": "integer" },
+        "replyToMessageId": { "type": "string" },
+        "replyPreviewCiphertext": { "type": "string" },
+        "replyPreviewIv": { "type": "string" },
+        "deliveryStatus": { "type": "string", "enum": ["sent", "delivered", "read"] },
+        "edited": { "type": "boolean" },
+        "deleted": { "type": "boolean" },
+        "expiresAtEpochMs": { "type": "integer" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": [
+        "conversationId",
+        "memberUids",
+        "senderUid",
+        "senderPublicId",
+        "messageType",
+        "ciphertext",
+        "iv",
+        "encryptionScheme",
+        "mediaFileId",
+        "mediaUrl",
+        "mediaMimeType",
+        "mediaFileName",
+        "mediaSizeBytes",
+        "mediaDurationSec",
+        "replyToMessageId",
+        "replyPreviewCiphertext",
+        "replyPreviewIv",
+        "deliveryStatus",
+        "edited",
+        "deleted",
+        "expiresAtEpochMs",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "MediaFileRecord": {
+      "title": "MediaFileRecord",
+      "description": "Metadata for media files stored securely on Hostinger Shared Hosting.",
+      "type": "object",
+      "properties": {
+        "conversationId": { "type": "string" },
+        "memberUids": { "type": "array" },
+        "uploaderUid": { "type": "string" },
+        "storageProvider": { "type": "string", "enum": ["hostinger"] },
+        "remotePath": { "type": "string" },
+        "downloadUrl": { "type": "string" },
+        "mimeType": { "type": "string" },
+        "fileName": { "type": "string" },
+        "sizeBytes": { "type": "integer" },
+        "durationSec": { "type": "integer" },
+        "encrypted": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": [
+        "conversationId",
+        "memberUids",
+        "uploaderUid",
+        "storageProvider",
+        "remotePath",
+        "downloadUrl",
+        "mimeType",
+        "fileName",
+        "sizeBytes",
+        "durationSec",
+        "encrypted",
+        "createdAt"
+      ]
+    },
+    "AbuseReport": {
+      "title": "AbuseReport",
+      "description": "Immutable user report against abusive accounts.",
+      "type": "object",
+      "properties": {
+        "reporterUid": { "type": "string" },
+        "reportedUid": { "type": "string" },
+        "reportedPublicId": { "type": "string" },
+        "conversationId": { "type": "string" },
+        "reason": { "type": "string", "enum": ["spam", "harassment", "impersonation", "scam", "other"] },
+        "details": { "type": "string" },
+        "status": { "type": "string", "enum": ["submitted"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["reporterUid", "reportedUid", "reportedPublicId", "conversationId", "reason", "details", "status", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/UserProfile" },
+      "description": "Owner-isolated user profile and privacy configuration."
+    },
+    "/publicIds/{publicId}": {
+      "schema": { "$ref": "#/entities/PublicIdDirectory" },
+      "description": "Atomic unique Public ID lookup registry for discovering peers by exact ID, QR, or invite link."
+    },
+    "/encryptionKeys/{userId}": {
+      "schema": { "$ref": "#/entities/EncryptionKey" },
+      "description": "Public ECDH P-256 identity keys for E2EE shared-secret derivation."
+    },
+    "/users/{userId}/contacts/{contactUid}": {
+      "schema": { "$ref": "#/entities/ContactEntry" },
+      "description": "Owner-isolated saved contacts list."
+    },
+    "/users/{userId}/devices/{deviceId}": {
+      "schema": { "$ref": "#/entities/DeviceSession" },
+      "description": "Owner-isolated registered devices."
+    },
+    "/users/{userId}/recoveryData/{backupId}": {
+      "schema": { "$ref": "#/entities/RecoveryData" },
+      "description": "Owner-isolated encrypted E2EE key recovery vault."
+    },
+    "/users/{userId}/blockedUsers/{blockedUid}": {
+      "schema": { "$ref": "#/entities/BlockedUser" },
+      "description": "Owner-isolated blocked users list."
+    },
+    "/users/{userId}/notifications/{notificationId}": {
+      "schema": { "$ref": "#/entities/UserNotification" },
+      "description": "Per-user privacy-safe notifications feed."
+    },
+    "/conversations/{conversationId}": {
+      "schema": { "$ref": "#/entities/Conversation" },
+      "description": "Member-isolated private 1-to-1 conversations."
+    },
+    "/conversations/{conversationId}/messages/{messageId}": {
+      "schema": { "$ref": "#/entities/ChatMessage" },
+      "description": "Member-isolated E2EE messages and Hostinger media references."
+    },
+    "/mediaFiles/{mediaId}": {
+      "schema": { "$ref": "#/entities/MediaFileRecord" },
+      "description": "Member-isolated metadata for files stored on Hostinger Shared Hosting."
+    },
+    "/reports/{reportId}": {
+      "schema": { "$ref": "#/entities/AbuseReport" },
+      "description": "Immutable abuse reports submitted by authenticated users."
+    }
+  }
+}

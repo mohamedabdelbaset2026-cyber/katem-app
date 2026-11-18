@@ -1,0 +1,11 @@
+# Protect internal helper/config files inside public_html/katem-api/
+Options -Indexes
+
+<FilesMatch "^(config\.php|config\.example\.php|auth_helper\.php)$">
+    Require all denied
+</FilesMatch>
+
+# Forward Authorization header to PHP-FPM / Apache CGI on Hostinger Shared Hosting
+RewriteEngine On
+RewriteCond %{HTTP:Authorization} ^(.*)
+RewriteRule .* - [e=HTTP_AUTHORIZATION:%1]

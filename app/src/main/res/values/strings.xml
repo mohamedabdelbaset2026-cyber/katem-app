@@ -1,0 +1,57 @@
+<resources>
+    <string name="app_name">كاتم</string>
+    <string name="app_tagline">مراسلة خاصة ومشفرة بالمعرّف الشخصي</string>
+    <string name="auth_subtitle">احصل على رقم خاص فريد لا يتكرر (KTM-ID)، ثم اختر اسمك وكلمة مرورك وابدأ المراسلة المشفّرة فورًا.</string>
+    <string name="auth_sign_in_google">تسجيل الدخول</string>
+    <string name="auth_feature_e2ee">١. تفعيل جلسة سحابية مشفّرة (بريدك مخفي تمامًا عن الجميع)</string>
+    <string name="auth_feature_public_id">٢. توليد رقم فريد غير قابل للتكرار (KTM-ID) خاص بك فورًا</string>
+    <string name="auth_feature_privacy">٣. إدخال اسمك وكلمة مرور حسابك والدخول المباشر للمحادثات</string>
+
+    <string name="nav_chats">المحادثات</string>
+    <string name="nav_contacts">جهات الاتصال</string>
+    <string name="nav_my_id">معرّفي</string>
+    <string name="nav_settings">الإعدادات</string>
+
+    <string name="chats_title">المحادثات</string>
+    <string name="chats_filter_all">الكل</string>
+    <string name="chats_filter_archived">المؤرشفة</string>
+    <string name="chats_search_hint">ابحث في المحادثات...</string>
+    <string name="chats_empty_title">لا توجد محادثات بعد</string>
+    <string name="chats_empty_subtitle">أضف أصدقاءك باستخدام معرّفهم الشخصي أو امسح رمز QR لبدء محادثة مشفّرة بالكامل.</string>
+    <string name="chats_saved_notes">الرسائل المحفوظة (مساحة خاصة)</string>
+
+    <string name="add_friend_title">إضافة صديق</string>
+    <string name="add_friend_input_hint">أدخل المعرّف (مثل KTM-482917) أو رابط الدعوة</string>
+    <string name="add_friend_search">بحث</string>
+    <string name="add_friend_scan_qr">مسح رمز QR</string>
+    <string name="add_friend_start_chat">بدء محادثة مشفّرة</string>
+    <string name="add_friend_save_contact">حفظ في جهات الاتصال</string>
+
+    <string name="my_id_title">معرّفي الشخصي</string>
+    <string name="my_id_copy">نسخ المعرّف</string>
+    <string name="my_id_share_link">مشاركة رابط الدعوة</string>
+    <string name="my_id_privacy_note">معرّفك العام هو الوسيلة الوحيدة للعثور عليك. لا يظهر بريدك الإلكتروني أو معرّف Firebase الداخلي لأي شخص.</string>
+
+    <string name="chat_input_hint">اكتب رسالة مشفّرة...</string>
+    <string name="chat_typing">يكتب الآن...</string>
+    <string name="chat_online">متصل الآن</string>
+    <string name="chat_encrypted_banner">هذه المحادثة محمية بتشفير من الطرف إلى الطرف (ECDH-P256 + AES-256-GCM).</string>
+    <string name="chat_message_deleted">تم حذف هذه الرسالة</string>
+    <string name="chat_message_edited">معدّلة</string>
+
+    <string name="settings_title">الإعدادات والملف الشخصي</string>
+    <string name="settings_sign_out">تسجيل الخروج</string>
+    <string name="privacy_shield_title">محتوى كاتم محمي</string>
+    <string name="privacy_shield_subtitle">أُخفيت الشاشة تلقائيًا لحماية خصوصية محادثاتك.</string>
+
+    <string name="cd_back">رجوع</string>
+    <string name="cd_search">بحث</string>
+    <string name="cd_add_friend">إضافة صديق جديد</string>
+    <string name="cd_send_message">إرسال الرسالة</string>
+    <string name="cd_attach_media">إرفاق وسائط أو ملفات</string>
+    <string name="cd_record_voice">تسجيل رسالة صوتية</string>
+    <string name="cd_more_options">خيارات إضافية</string>
+    <string name="cd_qr_code">رمز الاستجابة السريعة للمعرّف الشخصي</string>
+    <string name="cd_auth_hero">رسم توضيحي للتشفير والخصوصية</string>
+    <string name="cd_empty_chats">رسم توضيحي لبدء أول محادثة مشفّرة</string>
+</resources>

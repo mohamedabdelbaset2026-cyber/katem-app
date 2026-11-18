@@ -1,0 +1,6 @@
+{
+  "name": "كاتم - Katem",
+  "description": "تطبيق مراسلة فورية خاص ومشفر من الطرف إلى الطرف يعتمد على المعرف الشخصي الفريد.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
